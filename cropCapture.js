@@ -1,6 +1,7 @@
 const { desktopCapturer } = require('electron')
 const fs = require('fs');
 const folderName = 'cropCapture';
+const os = require('os');
 
 module.exports = function cropCapture (CropPosition, CropSize) {
     desktopCapturer.getSources({
@@ -14,10 +15,10 @@ module.exports = function cropCapture (CropPosition, CropSize) {
       for (const [idx, source] of sources.entries()) {
         let fileName = `screen_${idx}`;
         const rect ={
-          x: CropPosition[0] - 10,
-          y: CropPosition[1] - 20,
-          width: Math.ceil(CropSize[0] - (CropSize[0] * 0.21)),
-          height: Math.ceil(CropSize[1] - (CropSize[1] * 0.165))
+          x: CropPosition[0] - (os.platform() === 'win32' ? 16 : 10),
+          y: CropPosition[1] - (os.platform() === 'win32' ? 8 : 20),
+          width: Math.ceil(CropSize[0] - (CropSize[0] * (os.platform() === 'win32' ? 0.11 : 0.21))),
+          height: Math.ceil(CropSize[1] - (CropSize[1] * (os.platform() === 'win32' ? 0.1 : 0.165)))
         }
   
         const cropImg = source.thumbnail.crop(rect);
