@@ -17,7 +17,7 @@ const createWindow = () => {
 }
 
 let cropWin;
-ipcMain.on('openCropPopup', () => {
+function createCropWindow () {
   setTimeout(() => {
     if (!cropWin) {
       cropWin = new BrowserWindow({
@@ -34,12 +34,15 @@ ipcMain.on('openCropPopup', () => {
       cropWin.setOpacity(0.6);
       cropWin.frame = false;
       cropWin.loadFile('crop.html');
-      cropWin.setPosition(0, 0);
+      // cropWin.setPosition(0, 0);
       cropWin.on("close", () => {
         cropWin = null;
       })
     }
   }, 400);
+}
+ipcMain.on('openCropPopup', () => {
+  createCropWindow();
 });
 
 app.whenReady().then(() => {
