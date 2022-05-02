@@ -24,11 +24,14 @@ ipcMain.on('openCropPopup', () => {
         width: 600,
         height: 400,
         title: 'cropWindow',
+        transparent:true,
+        frame: false,
         webPreferences: {
           nodeIntegration: true,
           contextIsolation: false,
         }
       });
+      cropWin.setOpacity(0.6);
       cropWin.frame = false;
       cropWin.loadFile('crop.html');
       cropWin.setPosition(0, 0);

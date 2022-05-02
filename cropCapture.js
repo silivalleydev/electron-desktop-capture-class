@@ -14,7 +14,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
       for (const [idx, source] of sources.entries()) {
         let fileName = `screen_${idx}`;
         const rect ={
-          x: CropPosition[0] - 35,
+          x: CropPosition[0] - 10,
           y: CropPosition[1] - 20,
           width: Math.ceil(CropSize[0] - (CropSize[0] * 0.21)),
           height: Math.ceil(CropSize[1] - (CropSize[1] * 0.165))
