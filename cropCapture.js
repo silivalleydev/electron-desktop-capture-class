@@ -19,7 +19,6 @@ module.exports = function cropCapture (CropPosition, CropSize) {
         let fileName = `screen_${idx}`;
         const screenWidth = screen;
         // const screenHeight = screen.height;
-        console.log(1280 / screenWidth.getPrimaryDisplay().bounds.width)
 
         const rect ={
           x: CropPosition[0] - (os.platform() === 'win32' ? 16 : 10),
