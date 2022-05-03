@@ -23,8 +23,8 @@ module.exports = function cropCapture (CropPosition, CropSize) {
         const rect ={
           x: CropPosition[0] - (os.platform() === 'win32' ? 16 : 10),
           y: CropPosition[1] - (os.platform() === 'win32' ? 8 : 20),
-          width: Math.ceil(CropSize[0] * SOURCE_WIDTH / screenWidth.getPrimaryDisplay().bounds.width),
-          height: Math.ceil(CropSize[1] * SOURCE_HEIGHT / screenWidth.getPrimaryDisplay().bounds.height)
+          width: Math.round(CropSize[0] * SOURCE_WIDTH / screenWidth.getPrimaryDisplay().bounds.width),
+          height: Math.round(CropSize[1] * SOURCE_HEIGHT / screenWidth.getPrimaryDisplay().bounds.height)
         }
   
         const cropImg = source.thumbnail.crop(rect);
