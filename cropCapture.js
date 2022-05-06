@@ -20,11 +20,14 @@ module.exports = function cropCapture (CropPosition, CropSize) {
       const cropSizeWidth = CropSize[0];
       const cropSizeHeight = CropSize[1];
 
+      const mainScreenWidthRatio = SOURCE_WIDTH / screen.getPrimaryDisplay().bounds.width;
+      const mainScreenHeightRatio = SOURCE_HEIGHT / screen.getPrimaryDisplay().bounds.height;
+
       const mainRect ={
-        x: cropPositionX - (os.platform() === 'win32' ? 16 : 10),
-        y: cropPositionY - (os.platform() === 'win32' ? 8 : 20),
-        width: Math.round(cropSizeWidth * SOURCE_WIDTH / screen.getPrimaryDisplay().bounds.width),
-        height: Math.round(cropSizeHeight * SOURCE_HEIGHT / screen.getPrimaryDisplay().bounds.height)
+        x: Math.round(cropPositionX * mainScreenWidthRatio),
+        y: Math.round(cropPositionY * mainScreenHeightRatio),
+        width: Math.round(cropSizeWidth * mainScreenWidthRatio),
+        height: Math.round(cropSizeHeight * mainScreenHeightRatio)
       };
 
       const matchScreen = screen.getDisplayMatching(mainRect);
@@ -46,6 +49,9 @@ module.exports = function cropCapture (CropPosition, CropSize) {
           isCropTargetScreenId.push(mainScreen.id);
           isCropTargetScreenId.push(matchScreen.id);
 
+          const matchScreenWidthRatio = SOURCE_WIDTH / matchScreen.size.width;
+          const matchScreenHeightRatio = SOURCE_HEIGHT / matchScreen.size.height;
+
           // 왼쪽 모니터
           if (cropPositionX < 0) {
             // 크롭할 사이즈보다 cropPosition X축이 큰 경우 <-- 크롭영역이 왼쪽 화면으로 아예 넘어간 경우(겹치지 않음)
@@ -53,10 +59,10 @@ module.exports = function cropCapture (CropPosition, CropSize) {
               cropTargetScreenArr.push({
                 id: matchScreen.id,
                 rect: {
-                  x: (matchScreen.size.width + cropPositionX) - (os.platform() === 'win32' ? 16 : 10),
-                  y: cropPositionY - (os.platform() === 'win32' ? 8 : 20),
-                  width: Math.round(cropSizeWidth * SOURCE_WIDTH / matchScreen.size.width),
-                  height: Math.round(cropSizeHeight * SOURCE_HEIGHT / matchScreen.size.height)
+                  x: Math.round((matchScreen.size.width + cropPositionX) * matchScreenWidthRatio),
+                  y: Math.round(cropPositionY * matchScreenHeightRatio),
+                  width: Math.round(cropSizeWidth * matchScreenWidthRatio),
+                  height: Math.round(cropSizeHeight * matchScreenHeightRatio)
                 }
               });
             } else {
@@ -71,8 +77,8 @@ module.exports = function cropCapture (CropPosition, CropSize) {
               cropTargetScreenArr.push({
                 id: matchScreen.id,
                 rect: {
-                  x: cropPositionX - (os.platform() === 'win32' ? 16 : 10),
-                  y: (matchScreen.size.height + cropPositionY) - (os.platform() === 'win32' ? 8 : 20),
+                  x: Math.round(cropPositionX * matchScreenWidthRatio),
+                  y: Math.round((matchScreen.size.height + cropPositionY) * matchScreenHeightRatio),
                   width: Math.round(cropSizeWidth * SOURCE_WIDTH / matchScreen.size.width),
                   height: Math.round(cropSizeHeight * SOURCE_HEIGHT / matchScreen.size.height)
                 }
@@ -88,8 +94,8 @@ module.exports = function cropCapture (CropPosition, CropSize) {
               cropTargetScreenArr.push({
                 id: matchScreen.id,
                 rect: {
-                  x: (cropPositionX - matchScreen.size.width) - (os.platform() === 'win32' ? 16 : 10),
-                  y: cropPositionY - (os.platform() === 'win32' ? 8 : 20),
+                  x: Math.round((cropPositionX - matchScreen.size.width) * matchScreenWidthRatio),
+                  y: Math.round(cropPositionY * matchScreenHeightRatio),
                   width: Math.round(cropSizeWidth * SOURCE_WIDTH / matchScreen.size.width),
                   height: Math.round(cropSizeHeight * SOURCE_HEIGHT / matchScreen.size.height)
                 }
