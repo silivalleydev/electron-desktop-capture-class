@@ -2,8 +2,8 @@ const { desktopCapturer, screen } = require('electron')
 const fs = require('fs');
 const folderName = 'cropCapture';
 const os = require('os');
-const SOURCE_WIDTH = 1280;
-const SOURCE_HEIGHT = 720;
+const SOURCE_WIDTH = 2560;
+const SOURCE_HEIGHT = 1600;
 
 
 module.exports = function cropCapture (CropPosition, CropSize) {
@@ -13,21 +13,20 @@ module.exports = function cropCapture (CropPosition, CropSize) {
         width: SOURCE_WIDTH,
         height: SOURCE_HEIGHT
       } 
-  
     }).then(async sources => {
       const cropPositionX = CropPosition[0];
       const cropPositionY = CropPosition[1];
       const cropSizeWidth = CropSize[0];
       const cropSizeHeight = CropSize[1];
 
-      const mainScreenWidthRatio = SOURCE_WIDTH / screen.getPrimaryDisplay().bounds.width;
-      const mainScreenHeightRatio = SOURCE_HEIGHT / screen.getPrimaryDisplay().bounds.height;
+      const mainScreenWidth = screen.getPrimaryDisplay().bounds.width;
+      const mainScreenHeight = screen.getPrimaryDisplay().bounds.height;
 
       const mainRect ={
-        x: Math.round(cropPositionX * mainScreenWidthRatio),
-        y: Math.round(cropPositionY * mainScreenHeightRatio),
-        width: Math.round(cropSizeWidth * mainScreenWidthRatio),
-        height: Math.round(cropSizeHeight * mainScreenHeightRatio)
+        x: cropPositionX,
+        y: cropPositionY,
+        width: cropSizeWidth,
+        height: cropSizeHeight
       };
 
       const matchScreen = screen.getDisplayMatching(mainRect);
@@ -42,6 +41,10 @@ module.exports = function cropCapture (CropPosition, CropSize) {
           isCropTargetScreenId.push(mainScreen.id);
           cropTargetScreenArr.push({
             id: mainScreen.id,
+            resize: {
+              width: mainScreenWidth,
+              height: mainScreenHeight
+            },
             rect: mainRect
           });
         } else {
@@ -49,8 +52,8 @@ module.exports = function cropCapture (CropPosition, CropSize) {
           isCropTargetScreenId.push(mainScreen.id);
           isCropTargetScreenId.push(matchScreen.id);
 
-          const matchScreenWidthRatio = SOURCE_WIDTH / matchScreen.size.width;
-          const matchScreenHeightRatio = SOURCE_HEIGHT / matchScreen.size.height;
+          const matchScreenWidth = matchScreen.size.width;
+          const matchScreenHeight = matchScreen.size.height;
 
           // 왼쪽 모니터
           if (cropPositionX < 0) {
@@ -58,15 +61,45 @@ module.exports = function cropCapture (CropPosition, CropSize) {
             if (Math.abs(cropPositionX) >= cropSizeWidth) {
               cropTargetScreenArr.push({
                 id: matchScreen.id,
+                resize: {
+                  width: matchScreenWidth,
+                  height: matchScreenHeight
+                },
                 rect: {
-                  x: Math.round((matchScreen.size.width + cropPositionX) * matchScreenWidthRatio),
-                  y: Math.round(cropPositionY * matchScreenHeightRatio),
-                  width: Math.round(cropSizeWidth * matchScreenWidthRatio),
-                  height: Math.round(cropSizeHeight * matchScreenHeightRatio)
+                  x: matchScreen.size.width + cropPositionX,
+                  y: cropPositionY,
+                  width: cropSizeWidth,
+                  height: cropSizeHeight
                 }
               });
             } else {
               // 크롭영역이 왼쪽과 메인화면에 겹치는 경우
+              cropTargetScreenArr.push({
+                id: matchScreen.id,
+                resize: {
+                  width: matchScreenWidth,
+                  height: matchScreenHeight
+                },
+                rect: {
+                  x: matchScreen.size.width + cropPositionX,
+                  y: cropPositionY,
+                  width: Math.abs(cropPositionX),
+                  height: cropSizeHeight
+                }
+              });
+              cropTargetScreenArr.push({
+                id: mainScreen.id,
+                resize: {
+                  width: mainScreenWidth,
+                  height: mainScreenHeight
+                },
+                rect: {
+                  x: 0,
+                  y: cropPositionY,
+                  width: cropSizeWidth + cropPositionX,
+                  height: cropSizeHeight
+                }              
+              });
 
             }
           }
@@ -76,15 +109,45 @@ module.exports = function cropCapture (CropPosition, CropSize) {
             if (Math.abs(cropPositionY) >= cropSizeHeight) {
               cropTargetScreenArr.push({
                 id: matchScreen.id,
+                resize: {
+                  width: matchScreenWidth,
+                  height: matchScreenHeight
+                },
                 rect: {
-                  x: Math.round(cropPositionX * matchScreenWidthRatio),
-                  y: Math.round((matchScreen.size.height + cropPositionY) * matchScreenHeightRatio),
-                  width: Math.round(cropSizeWidth * SOURCE_WIDTH / matchScreen.size.width),
-                  height: Math.round(cropSizeHeight * SOURCE_HEIGHT / matchScreen.size.height)
+                  x: cropPositionX,
+                  y: matchScreen.size.height + cropPositionY,
+                  width: cropSizeWidth,
+                  height: cropSizeHeight
                 }
               });
             } else {
               // 크롭영역이 위쪽과 메인화면에 겹치는 경우
+              cropTargetScreenArr.push({
+                id: matchScreen.id,
+                resize: {
+                  width: matchScreenWidth,
+                  height: matchScreenHeight
+                },
+                rect: {
+                  x: cropPositionX,
+                  y: matchScreen.size.height + cropPositionY,
+                  width: cropSizeWidth,
+                  height: Math.abs(cropPositionY)
+                }
+              });
+              cropTargetScreenArr.push({
+                id: mainScreen.id,
+                resize: {
+                  width: mainScreenWidth,
+                  height: mainScreenHeight
+                },
+                rect: {
+                  x: cropPositionX,
+                  y: 0,
+                  width: cropSizeWidth,
+                  height: cropSizeHeight + cropPositionY
+                }        
+              });
             }
           }
           // 오른쪽 모니터
@@ -93,15 +156,45 @@ module.exports = function cropCapture (CropPosition, CropSize) {
             if (cropSizeWidth >= (cropPositionX - mainScreen.size.width)) {
               cropTargetScreenArr.push({
                 id: matchScreen.id,
+                resize: {
+                  width: matchScreenWidth,
+                  height: matchScreenHeight
+                },
                 rect: {
-                  x: Math.round((cropPositionX - matchScreen.size.width) * matchScreenWidthRatio),
-                  y: Math.round(cropPositionY * matchScreenHeightRatio),
-                  width: Math.round(cropSizeWidth * SOURCE_WIDTH / matchScreen.size.width),
-                  height: Math.round(cropSizeHeight * SOURCE_HEIGHT / matchScreen.size.height)
+                  x: cropPositionX - mainScreenWidth,
+                  y: cropPositionY,
+                  width: cropSizeWidth,
+                  height: cropSizeHeight
                 }
               });
             } else {
               // 크롭 영역이 오른쪽화면과 메인화면에 겹치는경우
+              cropTargetScreenArr.push({
+                id: matchScreen.id,
+                resize: {
+                  width: matchScreenWidth,
+                  height: matchScreenHeight
+                },
+                rect: {
+                  x: cropPositionX - mainScreenWidth,
+                  y: cropPositionY,
+                  width: cropPositionX - mainScreenWidth,
+                  height: cropSizeHeight
+                }
+              });
+              cropTargetScreenArr.push({
+                id: mainScreen.id,
+                resize: {
+                  width: mainScreenWidth,
+                  height: mainScreenHeight
+                },
+                rect: {
+                  x: mainScreenWidth - (cropSizeWidth - (cropPositionX - mainScreenWidth)),
+                  y: cropPositionY,
+                  width: cropSizeWidth - (cropPositionX - mainScreenWidth),
+                  height: cropSizeHeight + cropPositionY
+                }        
+              });
             }
           }
         }
@@ -109,8 +202,12 @@ module.exports = function cropCapture (CropPosition, CropSize) {
         isCropTargetScreenId.push(mainScreen.id);
         cropTargetScreenArr.push({
           id: mainScreen.id,
+          resize: {
+            width: mainScreenWidth,
+            height: mainScreenHeight
+          },
           rect: mainRect
-        });      
+        });
       }
 
       for (const [idx, source] of sources.entries()) {
@@ -119,13 +216,14 @@ module.exports = function cropCapture (CropPosition, CropSize) {
         if (isCropTargetScreenId.includes(Number(source.display_id))) {
           const targetScreen = cropTargetScreenArr.filter(targetScreen => targetScreen.id === Number(source.display_id))?.[0];
           if (targetScreen) {
-            const cropImg = source.thumbnail.crop(targetScreen.rect);
+            
+            const cropImg = source.thumbnail.resize(targetScreen.resize).crop(targetScreen.rect);
             const cropBuffer = cropImg.toPNG();
             const isExists = fs.existsSync( `./${folderName}` );
             if(!isExists) {
                 createImg(cropBuffer, fileName);
             } else {
-                fs.rmdir(`./${folderName}`, { recursive: true }, (err) => {
+                fs.rm(`./${folderName}`, { recursive: true }, (err) => {
                   if (err) {
                       throw err;
                   }
