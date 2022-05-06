@@ -10,5 +10,8 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "^18.2.0"
+  },
+  "dependencies": {
+    "combine-image": "^1.0.3"
   }
 }

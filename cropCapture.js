@@ -232,8 +232,10 @@ module.exports = function cropCapture (CropPosition, CropSize) {
             }
           }
         }
-
       }
+
+      combineImage();
+
     })
   }
 
@@ -245,4 +247,54 @@ module.exports = function cropCapture (CropPosition, CropSize) {
         console.log('cropBuffer Saved');
       })
     },400)
+  }
+
+  function combineImage() {
+    let imageNameList = [];
+    const files = fs.readdirSync('./cropCapture', {withFileTypes: true});
+    imageNameList = files.map(file => `./cropCapture/${file.name}`);
+
+    setTimeout(() => {
+      const combineImage = require('combine-image');
+      console.log('imageNameList??', imageNameList)
+
+      combineImage(imageNameList)
+        .then((img) => {
+          // Save image as file
+          const isExists = fs.existsSync( './cropCaptureCombine' );
+          if( !isExists ) {
+              fs.mkdirSync( './cropCaptureCombine', { recursive: true } );
+              setTimeout(() => {
+                img.write('./cropCaptureCombine/out.png', () => {
+                  console.log('done')
+                  // 파일을 읽는 것 <-- 이미지를 버퍼 데이터로 제공해주는것
+                  fs.readFile("./cropCaptureCombine/out.png", function (err, buff) {
+                    if (err) throw err;
+                    
+                    const resultFullScreenBuffer = buff;
+                    console.log('풀스크린 결과 버퍼값 =>', resultFullScreenBuffer)
+                });
+                });
+            }, 500)
+          } else {
+            fs.rm('./cropCaptureCombine', { recursive: true }, (err) => {
+              if (err) {
+                  throw err;
+              }
+              fs.mkdirSync( './cropCaptureCombine', { recursive: true });
+              setTimeout(() => {
+                  img.write('./cropCaptureCombine/out.png', () => {
+                    console.log('done')
+                    fs.readFile("./cropCaptureCombine/out.png", function (err, buff) {
+                      if (err) throw err;
+                      
+                      const resultFullScreenBuffer = buff;
+                      console.log('풀스크린 결과 버퍼값 =>', resultFullScreenBuffer)
+                  });
+                  });
+              }, 500)
+            })
+            }
+        });
+    }, 500)
   }
