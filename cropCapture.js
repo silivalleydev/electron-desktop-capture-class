@@ -1,7 +1,6 @@
 const { desktopCapturer, screen } = require('electron')
 const fs = require('fs');
 const folderName = 'cropCapture';
-const os = require('os');
 const SOURCE_WIDTH = 2560;
 const SOURCE_HEIGHT = 1600;
 
