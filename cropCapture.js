@@ -48,8 +48,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
           });
         } else {
           // 크롭할 디스플레이 입력
-          isCropTargetScreenId.push(mainScreen.id);
-          isCropTargetScreenId.push(matchScreen.id);
+
 
           const matchScreenWidth = matchScreen.size.width;
           const matchScreenHeight = matchScreen.size.height;
@@ -58,6 +57,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
           if (cropPositionX < 0) {
             // 크롭할 사이즈보다 cropPosition X축이 큰 경우 <-- 크롭영역이 왼쪽 화면으로 아예 넘어간 경우(겹치지 않음)
             if (Math.abs(cropPositionX) >= cropSizeWidth) {
+              isCropTargetScreenId.push(matchScreen.id);
               cropTargetScreenArr.push({
                 id: matchScreen.id,
                 resize: {
@@ -66,7 +66,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
                 },
                 rect: {
                   x: matchScreen.size.width + cropPositionX,
-                  y: cropPositionY,
+                  y: cropPositionY - matchScreen.bounds.y,
                   width: cropSizeWidth,
                   height: cropSizeHeight
                 }
@@ -106,6 +106,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
           if (cropPositionY < 0) {
             // 크롭할 사이즈보다 cropPosition Y축이 큰 경우 <-- 크롭영역이 위쪽 화면으로 아예 넘어간 경우(겹치지 않음)
             if (Math.abs(cropPositionY) >= cropSizeHeight) {
+              isCropTargetScreenId.push(matchScreen.id);
               cropTargetScreenArr.push({
                 id: matchScreen.id,
                 resize: {
@@ -113,7 +114,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
                   height: matchScreenHeight
                 },
                 rect: {
-                  x: cropPositionX,
+                  x: cropPositionX - matchScreen.bounds.x,
                   y: matchScreen.size.height + cropPositionY,
                   width: cropSizeWidth,
                   height: cropSizeHeight
@@ -128,7 +129,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
                   height: matchScreenHeight
                 },
                 rect: {
-                  x: cropPositionX,
+                  x: cropPositionX - mainScreen.bounds.x,
                   y: matchScreen.size.height + cropPositionY,
                   width: cropSizeWidth,
                   height: Math.abs(cropPositionY)
@@ -141,7 +142,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
                   height: mainScreenHeight
                 },
                 rect: {
-                  x: cropPositionX,
+                  x: cropPositionX - matchScreen.bounds.x,
                   y: 0,
                   width: cropSizeWidth,
                   height: cropSizeHeight + cropPositionY
@@ -150,9 +151,13 @@ module.exports = function cropCapture (CropPosition, CropSize) {
             }
           }
           // 오른쪽 모니터
-          if (cropPositionX > mainScreen.size.width) {
+          if ((cropPositionX + cropSizeWidth) >= mainScreenWidth) {
             // 크롭 영역이 오른쪽화면으로 넘어간 경우
-            if (cropSizeWidth >= (cropPositionX - mainScreen.size.width)) {
+            console.log((cropPositionX - mainScreenWidth) >= cropSizeWidth)
+            console.log((cropPositionX - mainScreenWidth), cropSizeWidth)
+            console.log(cropPositionX, mainScreenWidth, cropSizeWidth)
+            if (cropPositionX >= cropSizeWidth) {
+              isCropTargetScreenId.push(matchScreen.id);
               cropTargetScreenArr.push({
                 id: matchScreen.id,
                 resize: {
@@ -161,7 +166,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
                 },
                 rect: {
                   x: cropPositionX - mainScreenWidth,
-                  y: cropPositionY,
+                  y: cropPositionY - matchScreen.bounds.y,
                   width: cropSizeWidth,
                   height: cropSizeHeight
                 }
@@ -234,7 +239,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
         }
       }
 
-      combineImage();
+      // combineImage();
 
     })
   }
@@ -297,4 +302,5 @@ module.exports = function cropCapture (CropPosition, CropSize) {
             }
         });
     }, 500)
+    .catch(err => console.log(err))
   }
