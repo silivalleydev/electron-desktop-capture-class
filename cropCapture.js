@@ -162,11 +162,14 @@ module.exports = function cropCapture (CropPosition, CropSize) {
           }
           // 오른쪽 모니터
           if ((cropPositionX + cropSizeWidth) >= mainScreenWidth) {
+
             // 크롭 영역이 오른쪽화면으로 넘어간 경우
             console.log((cropPositionX - mainScreenWidth) >= cropSizeWidth)
             console.log((cropPositionX - mainScreenWidth), cropSizeWidth)
             console.log(cropPositionX, mainScreenWidth, cropSizeWidth)
-            if (cropPositionX >= cropSizeWidth) {
+            if (cropPositionX >= mainScreenWidth) {
+              console.log('if????????')
+
               isCropTargetScreenId.push(matchScreen.id);
               cropTargetScreenArr.push({
                 id: matchScreen.id,
@@ -182,7 +185,11 @@ module.exports = function cropCapture (CropPosition, CropSize) {
                 }
               });
             } else {
+              console.log('else')
               // 크롭 영역이 오른쪽화면과 메인화면에 겹치는경우
+              isCropTargetScreenId.push(matchScreen.id);
+              isCropTargetScreenId.push(mainScreen.id);
+
               cropTargetScreenArr.push({
                 id: matchScreen.id,
                 resize: {
@@ -190,9 +197,9 @@ module.exports = function cropCapture (CropPosition, CropSize) {
                   height: matchScreenHeight
                 },
                 rect: {
-                  x: cropPositionX - mainScreenWidth,
-                  y: cropPositionY,
-                  width: cropPositionX - mainScreenWidth,
+                  x: 0,
+                  y: cropPositionY - matchScreen.bounds.y,
+                  width: (cropPositionX + cropSizeWidth) - mainScreenWidth,
                   height: cropSizeHeight
                 }
               });
@@ -203,10 +210,10 @@ module.exports = function cropCapture (CropPosition, CropSize) {
                   height: mainScreenHeight
                 },
                 rect: {
-                  x: mainScreenWidth - (cropSizeWidth - (cropPositionX - mainScreenWidth)),
+                  x: cropPositionX,
                   y: cropPositionY,
-                  width: cropSizeWidth - (cropPositionX - mainScreenWidth),
-                  height: cropSizeHeight + cropPositionY
+                  width: mainScreenWidth - cropPositionX,
+                  height: cropSizeHeight
                 }        
               });
             }
