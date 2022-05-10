@@ -54,13 +54,12 @@ module.exports = function cropCapture (CropPosition, CropSize) {
           });
         } else {
           // 크롭할 디스플레이 입력
-
-
           const matchScreenWidth = matchScreen.size.width;
           const matchScreenHeight = matchScreen.size.height;
           let isAlreadyInCondition = false;
-          //왼쪽 위에 캡쳐
+          // //왼쪽 위에 캡쳐
           if (cropPositionX < 0 && cropPositionY < 0 && !isAlreadyInCondition) {
+            console.log(matchScreen.bounds.x, matchScreenWidth, cropPositionX)
             isAlreadyInCondition = true;
             isCropTargetScreenId.push(matchScreen.id);
             cropTargetScreenArr.push({
@@ -70,14 +69,14 @@ module.exports = function cropCapture (CropPosition, CropSize) {
                 height: matchScreenHeight
               },
               rect: {
-                x: matchScreenWidth + cropPositionX,
+                x: matchScreenWidth + matchScreen.bounds.x > 0 ? cropPositionX + Math.abs(matchScreen.bounds.x) : matchScreenWidth + cropPositionX,
                 y: cropPositionY - matchScreen.bounds.y,
                 width: cropSizeWidth,
                 height: cropSizeHeight
               }
             });
           }
-          // 왼쪽 아래 캡쳐
+          // // 왼쪽 아래 캡쳐
           if (cropPositionX < 0 && cropPositionY >= mainScreenHeight && !isAlreadyInCondition) {
             isAlreadyInCondition = true;
             isCropTargetScreenId.push(matchScreen.id);
@@ -88,7 +87,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
                 height: matchScreenHeight
               },
               rect: {
-                x: matchScreenWidth + cropPositionX,
+                x: matchScreenWidth + matchScreen.bounds.x > 0 ? cropPositionX + Math.abs(matchScreen.bounds.x) : matchScreenWidth + cropPositionX,
                 y: cropPositionY - matchScreen.bounds.y,
                 width: cropSizeWidth,
                 height: cropSizeHeight
@@ -98,7 +97,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
 
           // 오른쪽 위에 캡쳐하는 경우
           if (cropPositionX >= mainScreenWidth && cropPositionY < 0 && !isAlreadyInCondition) {
-            console.log(matchScreenHeight, cropPositionY, matchScreen.bounds.y)
+            console.log(mainScreenWidth, cropPositionX, matchScreen.bounds.x)
             isAlreadyInCondition = true;
             isCropTargetScreenId.push(matchScreen.id);
             cropTargetScreenArr.push({
@@ -108,8 +107,9 @@ module.exports = function cropCapture (CropPosition, CropSize) {
                 height: matchScreenHeight
               },
               rect: {
-                x: cropPositionX - mainScreenWidth,
-                y: matchScreenHeight + cropPositionY + matchScreen.bounds.y,
+                x: (matchScreen.bounds.x < mainScreenWidth) ? cropPositionX - mainScreenWidth + (mainScreenWidth - matchScreen.bounds.x) : cropPositionX - mainScreenWidth,
+                // x: cropPositionX - mainScreenWidth,
+                y: cropPositionY - matchScreen.bounds.y,
                 width: cropSizeWidth,
                 height: cropSizeHeight
               }
@@ -117,7 +117,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
           }
           // 오른쪽 아래에 캡쳐하는 경우
           if (cropPositionX >= mainScreenWidth && cropPositionY >= mainScreenHeight && !isAlreadyInCondition) {
-            console.log(matchScreenHeight, cropPositionY, matchScreen.bounds.y)
+            console.log(matchScreen.bounds.x, cropPositionX, mainScreenWidth)
             isAlreadyInCondition = true;
             isCropTargetScreenId.push(matchScreen.id);
             cropTargetScreenArr.push({
@@ -127,7 +127,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
                 height: matchScreenHeight
               },
               rect: {
-                x: cropPositionX - mainScreenWidth,
+                x: (matchScreen.bounds.x < mainScreenWidth) ? cropPositionX - mainScreenWidth + (mainScreenWidth - matchScreen.bounds.x) : cropPositionX - mainScreenWidth,
                 y: cropPositionY - matchScreen.bounds.y,
                 width: cropSizeWidth,
                 height: cropSizeHeight
@@ -194,6 +194,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
             isAlreadyInCondition = true;
             // 크롭할 사이즈보다 cropPosition Y축이 큰 경우 <-- 크롭영역이 위쪽 화면으로 아예 넘어간 경우(겹치지 않음)
             if (Math.abs(cropPositionY) >= cropSizeHeight) {
+              console.log(matchScreenWidth, matchScreen.bounds.x, cropPositionX)
               isCropTargetScreenId.push(matchScreen.id);
               cropTargetScreenArr.push({
                 id: matchScreen.id,
@@ -203,7 +204,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
                 },
                 rect: {
                   x: cropPositionX - matchScreen.bounds.x,
-                  y: matchScreen.size.height + cropPositionY,
+                  y: matchScreenHeight + cropPositionY,
                   width: cropSizeWidth,
                   height: cropSizeHeight
                 }
