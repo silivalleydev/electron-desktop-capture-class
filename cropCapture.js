@@ -1,8 +1,8 @@
 const { desktopCapturer, screen } = require('electron')
 const fs = require('fs');
 const folderName = 'cropCapture';
-const SOURCE_WIDTH = 2560;
-const SOURCE_HEIGHT = 1600;
+const SOURCE_WIDTH = 10240;
+const SOURCE_HEIGHT = 6400;
 
 
 module.exports = function cropCapture (CropPosition, CropSize) {
@@ -77,7 +77,7 @@ module.exports = function cropCapture (CropPosition, CropSize) {
                 height: matchScreenHeight
               },
               rect: {
-                x: Math.abs(cropPositionX),
+                x: matchScreenWidth + cropPositionX,
                 y: cropPositionY - matchScreen.bounds.y,
                 width: cropSizeWidth,
                 height: cropSizeHeight
