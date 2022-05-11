@@ -5,10 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>cropWindow</title>
+    <style>
+        #dragg {
+            -webkit-app-region: drag;
+        }
+    </style>
 </head>
-<body style="background-color: red; height: 100%; font-size: 50px; font-weight: 900; text-align: center;">
-    <div style="margin-top: 30%; color: white;">
-        ENTER로 캡쳐
-    </div>
+<body style="height: 100%; margin: 0; font-size: 50px; font-weight: 900; text-align: center;">
+    <div id="dragg" style="height: 100vh; color: white; background-color: blue;"></div>
 </body>
 </html>
