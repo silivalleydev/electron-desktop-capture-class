@@ -1,17 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>cropWindow</title>
+    <script type="module" src="crop.js"></script>
     <style>
-        #dragg {
-            -webkit-app-region: drag;
-        }
+      body {
+        height: 100%;
+        margin: 0;
+        font-size: 50px;
+        font-weight: 900;
+        text-align: center;
+      }
+
+      #dragg {
+        height: 100vh;
+        color: white;
+        background-color: rgba(255, 255, 255, 0.5);
+        border: 2px solid #3a38d2;
+      }
+
+      .dragg_start {
+        -webkit-app-region: drag;
+      }
+
+      .btn {
+        width: 130px;
+        margin-right: 5px;
+        align-items: center;
+        justify-content: center;
+        border: solid 2px #12cfee;
+        background-color: #12cfee;
+        color: white;
+      }
     </style>
-</head>
-<body style="height: 100%; margin: 0; font-size: 50px; font-weight: 900; text-align: center;">
-    <div id="dragg" style="height: 100vh; color: white; background-color: blue;"></div>
-</body>
+  </head>
+  <body>
+    <div id="dragg" class="dragg_start">
+      <button class="btn" id="clickCapture">캡쳐</button>
+      <button class="btn" id="closeCaptureWin">취소</button>
+    </div>
+  </body>
 </html>

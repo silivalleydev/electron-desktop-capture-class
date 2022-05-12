@@ -34,6 +34,7 @@ function createCropWindow () {
       cropWin.setOpacity(0.6);
       cropWin.frame = false;
       cropWin.loadFile('crop.html');
+      cropWin.webContents.openDevTools()
       // cropWin.setPosition(0, 0);
       cropWin.on("close", () => {
         cropWin = null;
@@ -44,10 +45,7 @@ function createCropWindow () {
 ipcMain.on('openCropPopup', () => {
   createCropWindow();
 });
-
-app.whenReady().then(() => {
-  createWindow()
-  globalShortcut.register('Enter', () => {
+ipcMain.on('crop', () => {
     if (cropWin) {
       const CropPosition = [].concat(cropWin.getPosition());
       const CropSize = [].concat(cropWin.getSize());
@@ -56,7 +54,10 @@ app.whenReady().then(() => {
         cropCapture(CropPosition, CropSize);
       }, 200)
     }
-  });
+});
+
+app.whenReady().then(() => {
+  createWindow()
   globalShortcut.register('ESC', () => {
     if (cropWin) {
       cropWin.close();
